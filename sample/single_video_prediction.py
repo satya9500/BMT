@@ -5,6 +5,7 @@ import subprocess
 
 import numpy as np
 import torch
+import json
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from datasets.captioning_dataset import ActivityNetCaptionsDataset
@@ -312,6 +313,10 @@ if __name__ == "__main__":
     captions = caption_proposals(
         cap_model, feature_paths, train_dataset, cap_cfg, args.device_id, proposals, args.duration_in_secs
     )
+    #write to file
+    with open('predictions.json', 'w') as f:
+        json.dump(captions, f)
+    print('Done')
 
     print(captions)
 
