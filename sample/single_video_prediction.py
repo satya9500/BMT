@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 import torch
 import json
+import Video
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from datasets.captioning_dataset import ActivityNetCaptionsDataset
@@ -276,6 +277,29 @@ def get_video_duration(path):
     video_duration = float(result.stdout.decode('utf-8').replace('\n', ''))
     print('Video Duration:', video_duration)
     return video_duration
+
+#spilt video into multiple scenes using pyscenedetect
+def split_video_into_scenes(video_path, scene_detector, scene_detector_params, scene_detector_threshold):
+    '''Splits the video into multiple scenes using pyscenedetect
+    Args:
+        video_path (str): path to the video
+        scene_detector (str): name of the scene detector
+        scene_detector_params (dict): parameters for the scene detector
+        scene_detector_threshold (float): threshold for the scene detector
+    Returns:
+        List(Dict(str, Union(float, str))): A list of dicts where the keys are 'start', 'end', and 'sentence'.
+    '''
+    # load video
+    video = video_path
+    # detect scenes
+    scene_list = scene_detector.detect_scenes(video, **scene_detector_params)
+    # filter out scenes with less than threshold
+    scene_list = [scene for scene in scene_list if scene.confidence > scene_detector_threshold]
+    # sort by start time
+    scene_list.sort(key=lambda scene: scene.start_frame)
+    # convert to seconds
+    scene_list = [{'start': scene.start_frame / video.fps, 'end': scene.end_frame / video.fps} for scene in scene_list]
+    return scene_list
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='One video prediction')
