@@ -6,7 +6,6 @@ import subprocess
 import numpy as np
 import torch
 import json
-import Video
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from datasets.captioning_dataset import ActivityNetCaptionsDataset
